@@ -1,0 +1,14 @@
+70b*
+7b*
+merge_model/
+wandb/
+lora_model/
+*.pyc
+Llama*
+*.log
+*.json
+*.ipynb
+pg19/
+materials/
+*.sh
+*.jsonl

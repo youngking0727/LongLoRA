@@ -19,6 +19,8 @@ import transformers
 from peft import PeftModel
 from typing import Dict
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
+
 IGNORE_INDEX = -100
 DEFAULT_PAD_TOKEN = "[PAD]"
 DEFAULT_EOS_TOKEN = "</s>"
@@ -58,13 +60,13 @@ def smart_tokenizer_and_embedding_resize(
         output_embeddings[-num_new_tokens:] = output_embeddings_avg
 
 def main(args):
-    device = "cuda:0"
-    torch.cuda.set_device(device)
+    #device = "cuda:0"
+    #torch.cuda.set_device(device)
 
     print("base model", args.base_model)
     print("peft model", args.peft_model)
 
-    # Load model and tokenizer
+    # Load model and tokenizerx
     model = transformers.AutoModelForCausalLM.from_pretrained(
         args.base_model,
         cache_dir=args.cache_dir,
@@ -109,5 +111,6 @@ def main(args):
     tokenizer.save_pretrained(args.save_path)
 
 if __name__ == "__main__":
-    args = parse_config()
+    args = parse_config() 
     main(args)
+ 

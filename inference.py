@@ -9,6 +9,8 @@ from peft import PeftModel
 from transformers import GenerationConfig, TextStreamer
 from llama_attn_replace import replace_llama_attn
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
+
 PROMPT_DICT = {
     "prompt_no_input": (
         "Below is an instruction that describes a task. "
@@ -94,7 +96,9 @@ def main(args):
         torch_dtype=torch.float16,
         device_map="auto",
     )
-    model.resize_token_embeddings(32001)
+
+    
+    # model.resize_token_embeddings(32001)
 
     tokenizer = transformers.AutoTokenizer.from_pretrained(
         args.base_model,
@@ -103,6 +107,8 @@ def main(args):
         padding_side="right",
         use_fast=False,
     )
+    # TODO: 这里不知道要不要注掉 
+    print("len: ", len(tokenizer))
 
     if torch.__version__ >= "2" and sys.platform != "win32":
         model = torch.compile(model)

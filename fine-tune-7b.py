@@ -29,6 +29,7 @@ from peft import LoraConfig, get_peft_model
 from torch.distributed import barrier
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 
+#os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
 
 from datasets import load_dataset
 
@@ -106,8 +107,6 @@ def tokenize_fn(tokenizer, example):
     )
     return {"input_ids": outputs["input_ids"].view(-1, context_length)}
 
-
-
 class SavePeftModelCallback(transformers.TrainerCallback):
     def save_model(self, args, state, kwargs):
         if state.best_model_checkpoint is not None:
@@ -116,8 +115,6 @@ class SavePeftModelCallback(transformers.TrainerCallback):
             checkpoint_folder = os.path.join(args.output_dir, f"{PREFIX_CHECKPOINT_DIR}-{state.global_step}")
 
         peft_model_path = os.path.join(checkpoint_folder, "pt_lora_model")
-        # TODO: 这一句不加保存的模型类型是float32?
-        kwargs["model"].dtype = torch.float16
         kwargs["model"].save_pretrained(peft_model_path, safe_serialization=False)
         kwargs["tokenizer"].save_pretrained(peft_model_path)
 
@@ -192,7 +189,7 @@ def train():
     #dataset = load_dataset("togethercomputer/RedPajama-Data-1T-Sample", cache_dir=training_args.cache_dir)
     #dataset = dataset.map(partial(tokenize_fn,tokenizer),batched=True, num_proc=128, remove_columns=["text", "meta"])
 
-    dataset = load_dataset("/AIRvePFS/dair/datasets/pretrain/1216", cache_dir=training_args.cache_dir, streaming=True) # 
+    dataset = load_dataset("/AIRvePFS/dair/datasets/pretrain/1216_test", cache_dir=training_args.cache_dir, streaming=True)
     dataset = dataset.map(partial(tokenize_fn,tokenizer),batched=True, remove_columns=["text"])
 
     if rank == 0:
@@ -222,7 +219,6 @@ def train():
         # enable trainable params 打印了一下发现默认都是False的，执行了下面这句就成了True，但是再次打印还是False，但是打印peft_model.named_parameters()就是True了
         [p.requires_grad_() for n, p in model.named_parameters() if any([k in n for k in training_args.trainable_params.split(",")])]
 
-    model.print_trainable_parameters()
     model.config.use_cache = False         # required for gradient checkpointing
     model.enable_input_require_grads()     # required for gradient checkpointing
     model.gradient_checkpointing_enable()  # enable gradient checkpointing

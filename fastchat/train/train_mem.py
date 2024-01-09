@@ -1,0 +1,15 @@
+# Make it more memory efficient by monkey patching the LLaMA model with FlashAttn.
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)))
+# Need to call this before importing transformers.
+from fastchat.train.llama2_flash_attn_monkey_patch import (
+    replace_llama_attn_with_flash_attn,
+)
+
+replace_llama_attn_with_flash_attn()
+
+from fastchat.train.train import train
+
+if __name__ == "__main__":
+    train()

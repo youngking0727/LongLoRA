@@ -114,7 +114,7 @@ def main(args):
 
     device = "cuda:0"
     seed = 2
-    torch.cuda.set_device(device)
+    #torch.cuda.set_device(device)
 
     torch.manual_seed(seed)
     random.seed(seed)
@@ -150,7 +150,7 @@ def main(args):
         torch_dtype=torch.float16,
         device_map="auto",
     )
-    model.resize_token_embeddings(32001)
+    # model.resize_token_embeddings(32001)
 
     if args.peft_model:
         trainable_params = os.path.join(args.peft_model, "trainable_params.bin")

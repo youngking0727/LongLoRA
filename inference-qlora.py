@@ -9,6 +9,8 @@ from peft import PeftModel
 from transformers import GenerationConfig, TextStreamer, BitsAndBytesConfig
 from llama_attn_replace import replace_llama_attn
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "4,5,6,7"
+
 PROMPT_DICT = {
     "prompt_no_input": (
         "Below is an instruction that describes a task. "
